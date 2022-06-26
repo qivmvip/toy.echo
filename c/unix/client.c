@@ -38,9 +38,15 @@
 #define BUFFER_SIZE (1024)
 #define MODULE "gypsy.toy.echo.c.unix"
 
-#define VRB(fmt, ...) (vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
-#define WRN(fmt, ...) (wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
-#define ERR(fmt, ...) (err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
+#define VRB(fmt, ...) ( \
+  vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
+#define WRN(fmt, ...) ( \
+  wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
+#define ERR(fmt, ...) ( \
+  err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
 #define RAW(fmt, ...) (raw(fmt, __VA_ARGS__))
 
 int main(int argc, char** argv) {
@@ -54,8 +60,8 @@ int main(int argc, char** argv) {
     WRN("No path provided, unsing default path =>  %s", PATH);
   }
 #ifdef __APPLE__
-  x_addr_un_t server_addr = {
-    .sun_len = sizeof(x_addr_un_t),
+  x_sockaddr_un_t server_addr = {
+    .sun_len = sizeof(x_sockaddr_un_t),
     .sun_family = AF_UNIX,
   };
 #else
@@ -83,7 +89,7 @@ int main(int argc, char** argv) {
   // connect
   int connect_result = connect(
     sockfd,
-    (x_addr_t *) &server_addr,
+    (x_sockaddr_t *) &server_addr,
     sizeof(server_addr)
   );
   if (0 != connect_result) {

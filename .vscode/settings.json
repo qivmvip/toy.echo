@@ -9,6 +9,7 @@
     "socket.h": "c",
     "args.h": "c",
     "inet.h": "c",
-    "complex": "c"
+    "complex": "c",
+    "un.h": "c"
   }
 }

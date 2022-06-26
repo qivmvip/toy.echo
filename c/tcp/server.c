@@ -38,9 +38,15 @@
 #define MODULE "gypsy.toy.echo.c.tcp"
 #define TAG "server"
 
-#define VRB(fmt, ...) (vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
-#define WRN(fmt, ...) (wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
-#define ERR(fmt, ...) (err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
+#define VRB(fmt, ...) ( \
+  vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
+#define WRN(fmt, ...) ( \
+  wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
+#define ERR(fmt, ...) ( \
+  err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
 #define RAW(fmt, ...) (raw(fmt, __VA_ARGS__))
 
 #define BUFFER_SIZE (1024)
@@ -77,15 +83,15 @@ int main(int argc, char** argv) {
 
 #ifdef __APPLE__
 # if defined(X_USING_IPV6)
-    x_addr_in6_t server_addr = {
-      .sin6_len = sizeof(x_addr_in6_t),
+    x_sockaddr_in6_t server_addr = {
+      .sin6_len = sizeof(x_sockaddr_in6_t),
       .sin6_family = AF_INET6,
       .sin6_port = htons((in_port_t) port),
       .sin6_addr = IN6ADDR_ANY_INIT,
     };
 # else
-   x_addr_in_t server_addr = {
-      .sin_len = sizeof(x_addr_in_t),
+   x_sockaddr_in_t server_addr = {
+      .sin_len = sizeof(x_sockaddr_in_t),
       .sin_family = AF_INET,
       .sin_port = htons((in_port_t) port),
       .sin_addr.s_addr = INADDR_ANY,
@@ -93,13 +99,13 @@ int main(int argc, char** argv) {
 # endif
 #else
 # if defined(X_USING_IPV6)
-    x_addr_in6_t server_addr = {
+    x_sockaddr_in6_t server_addr = {
       .sin6_family = AF_INET6,
       .sin6_port = htons((in_port_t) port),
       .sin6_addr = IN6ADDR_ANY_INIT,
     };
 # else
-    x_addr_in_t server_addr = {
+    x_sockaddr_in_t server_addr = {
       .sin_family = AF_INET,
       .sin_port = htons((in_port_t) port),
       .sin_addr.s_addr = INADDR_ANY,
@@ -122,7 +128,7 @@ int main(int argc, char** argv) {
   // bind
   int bind_result = bind(
     server_sockfd,
-    (x_addr_t *) &server_addr,
+    (x_sockaddr_t *) &server_addr,
     sizeof(server_addr)
   );
   if (0 != bind_result) {
@@ -150,16 +156,16 @@ int main(int argc, char** argv) {
   int sn = 0;
   char buffer[BUFFER_SIZE] = {0};
 # if defined(X_USING_IPV6)
-  x_addr_in6_t client_addr = {0};
+  x_sockaddr_in6_t client_addr = {0};
 # else
-  x_addr_in_t client_addr = {0};
+  x_sockaddr_in_t client_addr = {0};
 #endif
   socklen_t client_addr_len = sizeof(client_addr);
   while (true) {
     VRB("%s", "");
     VRB("#%#011x Server waiting...", ++sn);
     memset(&client_addr, 0, client_addr_len);
-    x_addr_t* client_addr_ptr = (x_addr_t*) &client_addr;
+    x_sockaddr_t* client_addr_ptr = (x_sockaddr_t*) &client_addr;
     int const client_sockfd = accept(
       server_sockfd, client_addr_ptr, &client_addr_len
     );

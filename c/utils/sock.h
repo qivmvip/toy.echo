@@ -26,13 +26,13 @@
 # error Unknown platform...
 #endif
 
-typedef struct sockaddr x_addr_t;
-typedef struct sockaddr_un x_addr_un_t;
+typedef struct sockaddr x_sockaddr_t;
+typedef struct sockaddr_un x_sockaddr_un_t;
 #if defined(X_USING_IPV6)
-  typedef struct sockaddr_in6 x_addr_in6_t;
+  typedef struct sockaddr_in6 x_sockaddr_in6_t;
   typedef struct in6_addr x_in6_addr_t;
 # else
-  typedef struct sockaddr_in x_addr_in_t;
+  typedef struct sockaddr_in x_sockaddr_in_t;
   typedef struct in_addr x_in_addr_t;
 #endif
 

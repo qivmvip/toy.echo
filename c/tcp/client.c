@@ -38,9 +38,15 @@
 #define MODULE "gypsy.toy.echo.c.tcp"
 #define TAG "client"
 
-#define VRB(fmt, ...) (vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
-#define WRN(fmt, ...) (wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
-#define ERR(fmt, ...) (err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
+#define VRB(fmt, ...) ( \
+  vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
+#define WRN(fmt, ...) ( \
+  wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
+#define ERR(fmt, ...) ( \
+  err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
 #define RAW(fmt, ...) (raw(fmt, __VA_ARGS__))
 
 #define BUFFER_SIZE (1024)
@@ -129,15 +135,15 @@ int main(int argc, char** argv) {
 #endif
 #ifdef __APPLE__
 # if defined(X_USING_IPV6)
-  x_addr_in6_t server_addr = {
-    .sin6_len = sizeof(x_addr_in6_t),
+  x_sockaddr_in6_t server_addr = {
+    .sin6_len = sizeof(x_sockaddr_in6_t),
     .sin6_family = AF_INET6,
     .sin6_addr = server_in6_addr,
     .sin6_port = htons((in_port_t) port),
   };
 # else
-  x_addr_in_t server_addr = {
-    .sin_len = sizeof(x_addr_in_t),
+  x_sockaddr_in_t server_addr = {
+    .sin_len = sizeof(x_sockaddr_in_t),
     .sin_family = AF_INET,
     .sin_addr = server_in_addr,
     .sin_port = htons((in_port_t) port),
@@ -145,13 +151,13 @@ int main(int argc, char** argv) {
 # endif
 #else
 # if defined(X_USING_IPV6)
-  x_addr_in6_t server_addr = {
+  x_sockaddr_in6_t server_addr = {
     .sin6_family = AF_INET6,
     .sin6_addr = server_in6_addr,
     .sin6_port = htons((in_port_t) port),
   };
 # else
-  x_addr_in_t server_addr = {
+  x_sockaddr_in_t server_addr = {
     .sin_family = AF_INET,
     .sin_addr = server_in_addr,
     .sin_port = htons((in_port_t) port),
@@ -174,7 +180,7 @@ int main(int argc, char** argv) {
   // connect
   int connect_result = connect(
     sockfd,
-    (x_addr_t *) &server_addr,
+    (x_sockaddr_t *) &server_addr,
     sizeof(server_addr)
   );
   if (0 != connect_result) {

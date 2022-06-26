@@ -149,13 +149,18 @@ static void log(FILE* dest,
                 int line,
                 char const* format,
                 va_list vlist) {
+#if defined(X_LOG_WITH_METAINFO)
+# define X_LOG_METAINFO_FMT " [%s::%s::%d]"
+# else
+# define X_LOG_METAINFO_FMT ""
+#endif
   char timestamp[32] = {0};
   fprintf(
     dest,
   #if defined(__APPLE__)
-    "#%#011llx %s %s [%#6llx::%#-7llx] [%s::%s] [%s::%s::%d] ",
+    "#%#011llx %s %s [%#6llx::%#-7llx] [%s::%s]" X_LOG_METAINFO_FMT " ",
   #else
-    "#%#011llx %s %s [%#6llx::%#-6llx] [%s::%s] [%s::%s::%d] ",
+    "#%#011llx %s %s [%#6llx::%#-6llx] [%s::%s]" X_LOG_METAINFO_FMT " ",
   #endif
     ++sn,
     get_timestamp(timestamp, sizeof(timestamp)),
@@ -163,10 +168,14 @@ static void log(FILE* dest,
     get_log_pid(),
     get_log_tid(),
     module,
+#if defined(X_LOG_WITH_METAINFO)
     tag,
     file,
     func,
     line
+#else
+    tag
+#endif
   );
 	vfprintf(dest, format, vlist);
 	fprintf(dest, "\n");

@@ -37,9 +37,15 @@
 #define TAG "server"
 #define PATH "gypsy.toy.echo.c.unix.sock"
 
-#define VRB(fmt, ...) (vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
-#define WRN(fmt, ...) (wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
-#define ERR(fmt, ...) (err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
+#define VRB(fmt, ...) ( \
+  vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
+#define WRN(fmt, ...) ( \
+  wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
+#define ERR(fmt, ...) ( \
+  err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
 #define RAW(fmt, ...) (raw(fmt, __VA_ARGS__))
 
 static void sigint_handler(int sig) {
@@ -61,8 +67,8 @@ int main(int argc, char** argv) {
   signal(SIGINT, sigint_handler);
 
 #ifdef __APPLE__
-  x_addr_un_t server_addr = {
-    .sun_len = sizeof(x_addr_un_t),
+  x_sockaddr_un_t server_addr = {
+    .sun_len = sizeof(x_sockaddr_un_t),
     .sun_family = AF_UNIX,
   };
 #else
@@ -97,7 +103,7 @@ int main(int argc, char** argv) {
   // bind
   int bind_result = bind(
     server_sockfd,
-    (x_addr_t *) &server_addr,
+    (x_sockaddr_t *) &server_addr,
     sizeof(server_addr)
   );
   if (0 != bind_result) {
@@ -124,13 +130,13 @@ int main(int argc, char** argv) {
   // accept
   int sn = 0;
   char buffer[BUFFER_SIZE] = {0};
-  x_addr_un_t client_addr = {0};
+  x_sockaddr_un_t client_addr = {0};
   socklen_t client_addr_len = sizeof(client_addr);
   while (true) {
     VRB("%s", "");
     VRB("#%#011x Server waiting...", ++sn);
     memset(&client_addr, 0, client_addr_len);
-    x_addr_t* client_addr_ptr = (x_addr_t*) &client_addr;
+    x_sockaddr_t* client_addr_ptr = (x_sockaddr_t*) &client_addr;
     int const client_sockfd = accept(
       server_sockfd, client_addr_ptr, &client_addr_len
     );
