@@ -30,18 +30,17 @@
 #endif
 
 #include "../utils/log.h"
+#include "../utils/sock.h"
 
 #define BUFFER_SIZE (1024)
 #define MODULE "gypsy.toy.echo.c.unix"
 #define TAG "server"
 #define PATH "gypsy.toy.echo.c.unix.sock"
-#define VRB(fmt, ...) (vrb(MODULE, TAG, fmt, __VA_ARGS__))
-#define WRN(fmt, ...) (wrn(MODULE, TAG, fmt, __VA_ARGS__))
-#define ERR(fmt, ...) (err(MODULE, TAG, fmt, __VA_ARGS__))
-#define RAW(fmt, ...) (raw(fmt, __VA_ARGS__))
 
-typedef struct sockaddr addr_t;
-typedef struct sockaddr_un addr_un_t;
+#define VRB(fmt, ...) (vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
+#define WRN(fmt, ...) (wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
+#define ERR(fmt, ...) (err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
+#define RAW(fmt, ...) (raw(fmt, __VA_ARGS__))
 
 static void sigint_handler(int sig) {
   RAW("%s1", "\n");
@@ -62,12 +61,12 @@ int main(int argc, char** argv) {
   signal(SIGINT, sigint_handler);
 
 #ifdef __APPLE__
-  addr_un_t server_addr = {
-    .sun_len = sizeof(addr_un_t),
+  x_addr_un_t server_addr = {
+    .sun_len = sizeof(x_addr_un_t),
     .sun_family = AF_UNIX,
   };
 #else
-  addr_un_t server_addr = {
+  x_addr_un_t server_addr = {
     .sun_family = AF_UNIX,
   };
 #endif
@@ -98,7 +97,7 @@ int main(int argc, char** argv) {
   // bind
   int bind_result = bind(
     server_sockfd,
-    (addr_t *) &server_addr,
+    (x_addr_t *) &server_addr,
     sizeof(server_addr)
   );
   if (0 != bind_result) {
@@ -125,13 +124,13 @@ int main(int argc, char** argv) {
   // accept
   int sn = 0;
   char buffer[BUFFER_SIZE] = {0};
-  addr_un_t client_addr = {0};
+  x_addr_un_t client_addr = {0};
   socklen_t client_addr_len = sizeof(client_addr);
   while (true) {
     VRB("%s", "");
     VRB("#%#011x Server waiting...", ++sn);
     memset(&client_addr, 0, client_addr_len);
-    addr_t* client_addr_ptr = (addr_t*) &client_addr;
+    x_addr_t* client_addr_ptr = (x_addr_t*) &client_addr;
     int const client_sockfd = accept(
       server_sockfd, client_addr_ptr, &client_addr_len
     );

@@ -7,19 +7,19 @@
 // + desc   : log utilities header
 
 
-#ifndef OOO_LOONG_TOY_ECHO_C_LOG_H
-#define OOO_LOONG_TOY_ECHO_C_LOG_H
+#ifndef OOO_LOONG_TOY_ECHO_C_UTILS_LOG_H
+#define OOO_LOONG_TOY_ECHO_C_UTILS_LOG_H
 
-void vrb(char const* module, char const* tag, char const* fmt, ...);
+void vrb(char const* module, char const* tag, char const* file, char const* func, int line, char const* fmt, ...);
 
-void dbg(char const* module, char const* tag, char const* fmt, ...);
+void dbg(char const* module, char const* tag, char const* file, char const* func, int line, char const* fmt, ...);
 
-void inf(char const* module, char const* tag, char const* fmt, ...);
+void inf(char const* module, char const* tag, char const* file, char const* func, int line, char const* fmt, ...);
 
-void wrn(char const* module, char const* tag, char const* fmt, ...);
+void wrn(char const* module, char const* tag, char const* file, char const* func, int line, char const* fmt, ...);
 
-void err(char const* module, char const* tag, char const* fmt, ...);
+void err(char const* module, char const* tag, char const* file, char const* func, int line, char const* fmt, ...);
 
 void raw(char const* fmt, ...);
 
-#endif // OOO_LOONG_TOY_ECHO_C_UNIX_LOG_H
+#endif // OOO_LOONG_TOY_ECHO_C_UTILS_LOG_H

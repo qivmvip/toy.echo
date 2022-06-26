@@ -21,8 +21,8 @@ done
 bin=${cwd}/bin/$(uname)
 exe=${bin}/echo_c_tcp_server6
 
-if [ -n "$1" ]; then
-  ${exe} "$1"
+if [ "$#" -gt "1" ]; then
+  ${exe} "$@"
 else
   ${exe} "--port=9999"
 fi

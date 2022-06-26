@@ -18,8 +18,8 @@ done
 bin=${cwd}/bin/$(uname)
 exe=${bin}/echo_c_tcp_client6
 
-if [ -n "$1" ]; then
-  ${exe} "$1"
+if [ "$#" -gt "1" ]; then
+  ${exe} "$@"
 else
   ${exe} "--ip=::1" "--port=9999" "--data=hello.$(date +%s)"
 fi

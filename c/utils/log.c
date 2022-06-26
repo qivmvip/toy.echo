@@ -144,15 +144,18 @@ static void log(FILE* dest,
                 char const* level,
                 char const* module,
                 char const* tag,
+                char const* file,
+                char const* func,
+                int line,
                 char const* format,
                 va_list vlist) {
   char timestamp[32] = {0};
   fprintf(
     dest,
   #if defined(__APPLE__)
-    "#%#011llx %s %s [%#6llx::%#-7llx] [%s::%s] ",
+    "#%#011llx %s %s [%#6llx::%#-7llx] [%s::%s] [%s::%s::%d] ",
   #else
-    "#%#011llx %s %s [%#6llx::%#-6llx] [%s::%s] ",
+    "#%#011llx %s %s [%#6llx::%#-6llx] [%s::%s] [%s::%s::%d] ",
   #endif
     ++sn,
     get_timestamp(timestamp, sizeof(timestamp)),
@@ -160,44 +163,47 @@ static void log(FILE* dest,
     get_log_pid(),
     get_log_tid(),
     module,
-    tag
+    tag,
+    file,
+    func,
+    line
   );
 	vfprintf(dest, format, vlist);
 	fprintf(dest, "\n");
 }
 
-void vrb(char const* module, char const* tag, char const* format, ...) {
+void vrb(char const* module, char const* tag, char const* file, char const* func, int line, char const* format, ...) {
 	va_list vlist;
 	va_start(vlist, format);
-  log(stdout, "VRB", module, tag, format, vlist);
+  log(stdout, "VRB", module, tag, file, func, line, format, vlist);
 	va_end(vlist);
 }
 
-void dbg(char const* module, char const* tag, char const* format, ...) {
+void dbg(char const* module, char const* tag, char const* file, char const* func, int line, char const* format, ...) {
 	va_list vlist;
 	va_start(vlist, format);
-  log(stdout, "DBG", module, tag, format, vlist);
+  log(stdout, "DBG", module, tag, file, func, line, format, vlist);
 	va_end(vlist);
 }
 
-void inf(char const* module, char const* tag, char const* format, ...) {
+void inf(char const* module, char const* tag, char const* file, char const* func, int line, char const* format, ...) {
 	va_list vlist;
 	va_start(vlist, format);
-  log(stdout, "INF", module, tag, format, vlist);
+  log(stdout, "INF", module, tag, file, func, line, format, vlist);
 	va_end(vlist);
 }
 
-void wrn(char const* module, char const* tag, char const* format, ...) {
+void wrn(char const* module, char const* tag, char const* file, char const* func, int line, char const* format, ...) {
 	va_list vlist;
 	va_start(vlist, format);
-  log(stderr, "WRN", module, tag, format, vlist);
+  log(stderr, "WRN", module, tag, file, func, line, format, vlist);
 	va_end(vlist);
 }
 
-void err(char const* module, char const* tag, char const* format, ...) {
+void err(char const* module, char const* tag, char const* file, char const* func, int line, char const* format, ...) {
 	va_list vlist;
 	va_start(vlist, format);
-  log(stderr, "ERR", module, tag, format, vlist);
+  log(stderr, "ERR", module, tag, file, func, line, format, vlist);
 	va_end(vlist);
 }
 

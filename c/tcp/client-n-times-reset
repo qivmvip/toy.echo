@@ -22,7 +22,7 @@ count=10; [ -n "$1" ] && count="$1"
 for ((i = 1; i <= count; i++)); do
   echo ""
   echo "#${i} ..."
-  pid="$(ps aux | grep '[e]cho_c_unix_server' | grep node -v | awk '{print $2}')"
+  pid="$(ps aux | grep '[e]cho_c_tcp_server' | grep node -v | awk '{print $2}')"
   if [ -n "${pid}" ]; then
     kill -9 "${pid}"
     sleep 0.1
