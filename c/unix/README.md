@@ -32,31 +32,6 @@ Client ->> Server: read
 ### 1. Multipass Ubuntu
 
 ```bash
-Starting primary  Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-97-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/advantage
-
-  System information as of Thu May  5 01:18:25 CST 2022
-
-  System load:              0.47
-  Usage of /:               83.2% of 4.67GB
-  Memory usage:             25%
-  Swap usage:               0%
-  Processes:                132
-  Users logged in:          0
-  IPv4 address for docker0: 172.17.0.1
-  IPv4 address for enp0s2:  192.168.64.3
-  IPv6 address for enp0s2:  fdfd:af2b:6e8d:4617:c83b:ccff:fe0e:1069
-
- * Super-optimized for small spaces - read how we shrank the memory
-   footprint of MicroK8s to make it the smallest full K8s around.
-
-   https://ubuntu.com/blog/microk8s-memory-optimisation
-
-43 updates can be applied immediately.
-To see these additional updates run: apt list --upgradable
 ```
 
 server `bind` error
