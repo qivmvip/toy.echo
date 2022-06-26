@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# 2022-06-18
+
+shfile=$0
+shdir=$(realpath "$(dirname "${shfile}")")
+cwd=$shdir
+
+echo "shfile =>  $0"
+echo "shdir  =>  ${shdir}"
+echo "cwd    =>  ${cwd}"
+
+i=1; for arg in "$@"; do
+  echo "arg[${i}] =>  ${arg}"
+  i=$((i + 1))
+done
+
+bin=${cwd}/bin/$(uname)
+exe=${bin}/echo_c_tcp_client6
+
+if [ -n "$1" ]; then
+  ${exe} "$1"
+else
+  ${exe} "--ip=::1" "--port=9999" "--data=hello.$(date +%s)"
+fi

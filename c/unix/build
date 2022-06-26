@@ -1,0 +1,28 @@
+#!/bin/bash
+
+shfile=$0
+shdir=$(realpath "$(dirname "${shfile}")")
+cwd=$shdir
+
+echo "shfile =>  $0"
+echo "shdir  =>  ${shdir}"
+echo "cwd    =>  ${cwd}"
+
+i=1; for arg in "$@"; do
+  echo "arg[${i}] =>  ${arg}"
+  i=$((i + 1))
+done
+
+bin=${cwd}/bin/$(uname)
+if [ -e ${bin} ]; then
+  rm -vrf ${bin}
+fi
+mkdir -vp ${bin}
+
+server=${bin}/echo_c_unix_server
+clang -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/log.c -o ${server}
+file ${server}
+
+client=${bin}/echo_c_unix_client
+clang -std=c11 -Wall ${cwd}/client.c ${cwd}/../utils/log.c -o ${client}
+file ${client}

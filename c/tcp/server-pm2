@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# 2022-06-18
+
+shfile=$0
+shdir=$(realpath "$(dirname "${shfile}")")
+cwd=$shdir
+
+echo "shfile =>  $0"
+echo "shdir  =>  ${shdir}"
+echo "cwd    =>  ${cwd}"
+
+i=1; for arg in "$@"; do
+  echo "arg[${i}] =>  ${arg}"
+  i=$((i + 1))
+done
+
+bin=${cwd}/bin/$(uname)
+exe=${bin}/echo_c_unix_server
+tmpfile=$(mktemp -u)
+tmpdir=$(dirname "${tmpfile}")
+sockdir=${tmpdir}/gypsy.toy.echo.sock
+mkdir -vp "${sockdir}"
+if [ -n "$1" ]; then
+  pm2 start --force --attach "${exe}" -- "$1"
+
+else
+  ts=$(date +%s)
+  tsfile=${sockdir}/timestamp
+  touch "${tsfile}"
+  echo "${ts}" > "${tsfile}"
+  sock=${sockdir}/unix.${ts}.sock
+
+  pm2 start --force --attach "${exe}" -- "${sock}"
+fi
