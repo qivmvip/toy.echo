@@ -21,6 +21,7 @@ Server ->> Server: bind
 Server ->> Server: listen
 Client ->> Server: connect
 Server ->> Server: accept
+Server ->> Server: fork
 Client ->> Server: write
 Server ->> Client: read
 Server ->> Client: write
