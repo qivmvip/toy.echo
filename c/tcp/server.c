@@ -52,10 +52,8 @@
 #define BUFFER_SIZE (1024)
 
 #define PORT (9987)
+#define BACKLOG (666)
 #define DATA ("hello")
-
-#define ARG_PORT_PREFIX ("--port=")
-#define ARG_PORT_PREFIX_LEN (strlen(ARG_PORT_PREFIX))
 
 static void sigint_handler(int sig) {
   RAW("%s1", "\n");
@@ -63,8 +61,28 @@ static void sigint_handler(int sig) {
   exit(EXIT_FAILURE);
 }
 
+#if defined(X_MULTICLIENT_FORK)
+static bool accept_client(int client_sockfd, char* buffer, size_t buffer_size) {
+  int const fork_result = fork();
+  if (0 == fork_result) {
+    sock_echo(MODULE, TAG, client_sockfd, buffer, BUFFER_SIZE);
+    close(client_sockfd);
+    exit(EXIT_SUCCESS);
+  } else {
+    if (-1 == fork_result) {
+      int error = errno;
+      ERR("Fork child fail =>  [%d::%s]", error, strerror(error));
+      return false;
+    } else {
+      return true;
+    }
+  }
+}
+#endif
+
 int main(int argc, char** argv) {
   int port = PORT;
+  int backlog = BACKLOG;
 
   // args
   VRB("argc =>  %d", argc);
@@ -72,6 +90,10 @@ int main(int argc, char** argv) {
     VRB("argv[%d]: %s", i, argv[i]);
     if (args_is_port(i, argv[i])) {
       port = args_parse_port(i, argv[i], PORT);
+      continue;
+    }
+    if (args_is_backlog(i, argv[i])) {
+      backlog = args_parse_backlog(i, argv[i], BACKLOG);
       continue;
     }
   }
@@ -138,13 +160,6 @@ int main(int argc, char** argv) {
   }
 
   // listen
-  int backlog = 666;
-  if (argc > 2) {
-    backlog = atoi(argv[2]);
-  }
-  if (backlog < 1) {
-    backlog = 666;
-  }
   int listen_result = listen(server_sockfd, backlog);
   if (0 != listen_result) {
     int const error = errno;
@@ -155,12 +170,15 @@ int main(int argc, char** argv) {
   // accept
   int sn = 0;
   char buffer[BUFFER_SIZE] = {0};
-# if defined(X_USING_IPV6)
+#if defined(X_USING_IPV6)
   x_sockaddr_in6_t client_addr = {0};
-# else
+#else
   x_sockaddr_in_t client_addr = {0};
 #endif
   socklen_t client_addr_len = sizeof(client_addr);
+#if defined(X_MULTICLIENT_FORK)
+  signal(SIGCHLD, SIG_IGN);
+#endif
   while (true) {
     VRB("%s", "");
     VRB("#%#011x Server waiting...", ++sn);
@@ -203,46 +221,22 @@ int main(int argc, char** argv) {
         int const error = errno;
         WRN("inet_ntop fail =>  [%d::%s]", error, strerror(error));
       } else {
-        VRB("Client address IPV6 =>  [%s]", addr_text_result);
+        VRB("Client address IPV4 =>  [%s]", addr_text_result);
       }
     }
 # endif
-    VRB("%s", "Echoing ...");
-    while (true) {
-      // read
-      ssize_t const read_n = read(client_sockfd, buffer, BUFFER_SIZE);
-      if (-1 == read_n) {
-        int const error = errno;
-        WRN(
-          "Read socket#%d fail =>  [%d::%s]",
-          client_sockfd,
-          error,
-          strerror(error)
-        );
+# if defined(X_MULTICLIENT_FORK)
+  for (int ac_retries = 0; ac_retries < 3; ++ac_retries) {
+      if (accept_client(client_sockfd, buffer, BUFFER_SIZE)) {
         break;
       }
-      if (0 == read_n) {
-        fputc('\n', stdout);
-        fflush(stdout);
-        break;
-      }
-      for (int i = 0; i < read_n; ++i) {
-        fputc(buffer[i], stdout);
-        fflush(stdout);
-      }
-      // write
-      ssize_t const write_n = write(client_sockfd, buffer, read_n);
-      if (read_n != write_n) {
-        int const error = errno;
-        WRN(
-          "Write client socket#%d fail =>  [%d::%s]",
-          client_sockfd,
-          error,
-          strerror(error)
-        );
-      }
-    }
+      usleep(11111);
+  }
+  close(client_sockfd);
+# else
+    sock_echo(MODULE, TAG, client_sockfd, buffer, BUFFER_SIZE);
     close(client_sockfd);
+#endif
   }
 
   return EXIT_SUCCESS;

@@ -36,4 +36,13 @@ typedef struct sockaddr_un x_sockaddr_un_t;
   typedef struct in_addr x_in_addr_t;
 #endif
 
+void
+sock_echo(
+  char const* module,
+  char const* tag,
+  int client_sockfd,
+  char* buffer,
+  size_t buffer_size
+);
+
 #endif // OOO_LOONG_TOY_ECHO_C_UTILS_SOCK_H

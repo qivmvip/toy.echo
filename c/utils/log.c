@@ -6,6 +6,7 @@
 // + date   : 2022-05-01
 // + desc   : log utilities implemetation.
 
+
 #if !defined(__APPLE__)
 # if defined(__linux__)
 #   if !defined(_GNU_SOURCE)
@@ -67,10 +68,6 @@ typedef unsigned long long int ull_t;
 # warning "__STDC_NO_ATOMICS__ defined"
 #endif
 
-// #if defined(__STDC_NO_THREADS__)
-// # warning "__STDC_NO_THREADS__ defined"
-// #endif
-
 #if defined(__STDC_NO_ATOMICS__)
   static ull_t sn = 0ull;
 #else
@@ -104,51 +101,96 @@ static char* get_timestamp(char* out_buffer, size_t size) {
   return out_buffer;
 }
 
-#if defined(__STDC_NO_ATOMICS__)
-  static ull_t log_pid_value = 0;
-  static ull_t get_log_pid() {
-    return (ull_t) getpid();
+static ull_t do_getpid() {
+  return (ull_t) getpid();
+}
+
+#if defined(__APPLE__)
+  static ull_t do_gettid() {
+    __uint64_t id = 0;
+    pthread_threadid_np(NULL, &id);
+    return (ull_t) id;
   }
 #else
-  static atomic_flag pid_flag = ATOMIC_FLAG_INIT;
-  static ull_t log_pid_value = 0;
-  static ull_t get_log_pid() {
-    if (!atomic_flag_test_and_set(&pid_flag)) {
-      log_pid_value = (ull_t) getpid();
-    }
-    return log_pid_value;
+  static ull_t do_gettid() {
+    return (ull_t) gettid();
   }
 #endif
 
-static _Thread_local ull_t log_tid_value = 0;
-# if defined(__APPLE__)
-  static ull_t get_log_tid() {
+#if defined(__STDC_NO_ATOMICS__)
+  static ull_t log_getpid() {
+    return do_getpid();
+  }
+
+  static ull_t log_gettid() {
+    return do_gettid();
+  }
+#else
+  static void register_pthread_atfork();
+
+  static atomic_flag pid_flag = ATOMIC_FLAG_INIT;
+  static ull_t log_pid_value = 0;
+  static ull_t log_getpid() {
+    register_pthread_atfork();
+    if (!atomic_flag_test_and_set(&pid_flag)) {
+      log_pid_value = do_getpid();
+    }
+    return log_pid_value;
+  }
+
+  static _Thread_local ull_t log_tid_value = 0;
+  static ull_t log_gettid() {
     if (0 == log_tid_value) {
-      __uint64_t id = 0;
-      pthread_threadid_np(NULL, &id);
-      log_tid_value = id;
+      log_tid_value = do_gettid();
     }
     return log_tid_value;
   }
-# else
-  static ull_t get_log_tid() {
-    if (0 == log_tid_value) {
-      log_tid_value = gettid();
-    }
-    return log_tid_value;
+
+  static void pthread_atfork_child_handler() {
+  #if 0
+    fprintf(
+      stdout,
+      "pthread_atfork_child_handler [%#6llx::%#-7llx]\n",
+      do_getpid(),
+      do_gettid()
+    );
+  #endif
+    atomic_flag_clear(&pid_flag);
+    log_tid_value = 0;
   }
-# endif
 
+  static atomic_flag pthread_atfork_flag = ATOMIC_FLAG_INIT;
+  static void register_pthread_atfork() {
+    if (!atomic_flag_test_and_set(&pthread_atfork_flag)) {
+#if 0
+      fprintf(
+        stdout,
+        "pthread_atfork [%#6llx::%#-7llx]\n",
+        do_getpid(),
+        do_gettid()
+      );
+#endif
+      int result = pthread_atfork(NULL, NULL, pthread_atfork_child_handler);
+      if (0 != result) {
+        atomic_flag_clear(&pthread_atfork_flag);
+      }
+    }
+  }
+#endif
 
-static void log(FILE* dest,
-                char const* level,
-                char const* module,
-                char const* tag,
-                char const* file,
-                char const* func,
-                int line,
-                char const* format,
-                va_list vlist) {
+static
+void
+log(
+  FILE* dest,
+  char const* level,
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* format,
+  va_list vlist
+) {
 #if defined(X_LOG_WITH_METAINFO)
 # define X_LOG_METAINFO_FMT " [%s::%s::%d]"
 # else
@@ -165,8 +207,8 @@ static void log(FILE* dest,
     ++sn,
     get_timestamp(timestamp, sizeof(timestamp)),
     level,
-    get_log_pid(),
-    get_log_tid(),
+    log_getpid(),
+    log_gettid(),
     module,
 #if defined(X_LOG_WITH_METAINFO)
     tag,
@@ -181,35 +223,80 @@ static void log(FILE* dest,
 	fprintf(dest, "\n");
 }
 
-void vrb(char const* module, char const* tag, char const* file, char const* func, int line, char const* format, ...) {
+void
+vrb(
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* format,
+  ...
+) {
 	va_list vlist;
 	va_start(vlist, format);
   log(stdout, "VRB", module, tag, file, func, line, format, vlist);
 	va_end(vlist);
 }
 
-void dbg(char const* module, char const* tag, char const* file, char const* func, int line, char const* format, ...) {
+void
+dbg(
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* format,
+  ...
+) {
 	va_list vlist;
 	va_start(vlist, format);
   log(stdout, "DBG", module, tag, file, func, line, format, vlist);
 	va_end(vlist);
 }
 
-void inf(char const* module, char const* tag, char const* file, char const* func, int line, char const* format, ...) {
+void
+inf(
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* format,
+  ...
+) {
 	va_list vlist;
 	va_start(vlist, format);
   log(stdout, "INF", module, tag, file, func, line, format, vlist);
 	va_end(vlist);
 }
 
-void wrn(char const* module, char const* tag, char const* file, char const* func, int line, char const* format, ...) {
+void
+wrn(
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* format,
+  ...
+) {
 	va_list vlist;
 	va_start(vlist, format);
   log(stderr, "WRN", module, tag, file, func, line, format, vlist);
 	va_end(vlist);
 }
 
-void err(char const* module, char const* tag, char const* file, char const* func, int line, char const* format, ...) {
+void
+err(
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* format,
+  ...
+) {
 	va_list vlist;
 	va_start(vlist, format);
   log(stderr, "ERR", module, tag, file, func, line, format, vlist);

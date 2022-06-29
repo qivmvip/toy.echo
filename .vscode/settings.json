@@ -10,6 +10,17 @@
     "args.h": "c",
     "inet.h": "c",
     "complex": "c",
-    "un.h": "c"
+    "un.h": "c",
+    "filesystem": "c",
+    "stdbool.h": "c",
+    "fstream": "c",
+    "locale": "c",
+    "*.tcc": "c",
+    "atomic": "c",
+    "errno.h": "c",
+    "__locale": "c",
+    "thread": "c",
+    "_pthread_types.h": "c",
+    "cerrno": "c"
   }
 }

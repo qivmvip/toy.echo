@@ -25,20 +25,30 @@ mkdir -vp ${bin}
 
 # server
 server=${bin}/echo_c_tcp_server
-clang -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c -o ${server}
+clang -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server}
 file ${server}
 
 # server6
 server6=${bin}/echo_c_tcp_server6
-clang -DX_USING_IPV6=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c -o ${server6}
+clang -DX_USING_IPV6=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server6}
 file ${server6}
+
+# server_mc_fork
+server_mc_fork=${bin}/echo_c_tcp_server_mc_fork
+clang -DX_MULTICLIENT_FORK=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server_mc_fork}
+file ${server_mc_fork}
+
+# server6_mc_fork
+server6_mc_fork=${bin}/echo_c_tcp_server6_mc_fork
+clang -DX_USING_IPV6=1 -DX_MULTICLIENT_FORK=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server6_mc_fork}
+file ${server6_mc_fork}
 
 # client
 client=${bin}/echo_c_tcp_client
-clang -std=c11 -Wall ${cwd}/client.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c -o ${client}
+clang -std=c11 -Wall ${cwd}/client.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${client}
 file ${client}
 
 # client6
 client6=${bin}/echo_c_tcp_client6
-clang -DX_USING_IPV6=1 -std=c11 -Wall ${cwd}/client.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c -o ${client6}
+clang -DX_USING_IPV6=1 -std=c11 -Wall ${cwd}/client.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${client6}
 file ${client6}

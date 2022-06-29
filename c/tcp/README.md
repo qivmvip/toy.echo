@@ -77,6 +77,8 @@ server
 + `bind` man: <https://man7.org/linux/man-pages/man2/bind.2.html>
 + `listen` man: <https://man7.org/linux/man-pages/man2/listen.2.html>
 + `accept` man: <https://man7.org/linux/man-pages/man2/accept.2.html>
++ `fork` man: <https://man7.org/linux/man-pages/man2/fork.2.html>
++ `usleep` man: <https://man7.org/linux/man-pages/man3/usleep.3.html>
 + `read` man: <https://man7.org/linux/man-pages/man2/read.2.html>
 + `write` man: <https://man7.org/linux/man-pages/man2/write.2.html>
 

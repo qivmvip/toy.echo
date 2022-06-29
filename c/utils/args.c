@@ -19,12 +19,32 @@
 #define ERR(fmt, ...) (err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
 #define RAW(fmt, ...) (raw(fmt, __VA_ARGS__))
 
+#define ARG_BACKLOG_PREFIX ("--backlog=")
+#define ARG_BACKLOG_PREFIX_LEN (strlen(ARG_IP_PREFIX))
+
 #define ARG_IP_PREFIX ("--ip=")
 #define ARG_IP_PREFIX_LEN (strlen(ARG_IP_PREFIX))
+
 #define ARG_PORT_PREFIX ("--port=")
 #define ARG_PORT_PREFIX_LEN (strlen(ARG_PORT_PREFIX))
+
 #define ARG_DATA_PREFIX ("--data=")
 #define ARG_DATA_PREFIX_LEN (strlen(ARG_DATA_PREFIX))
+
+bool args_is_backlog(int index, char const* arg) {
+  return 0 == strncmp(ARG_BACKLOG_PREFIX, arg, ARG_BACKLOG_PREFIX_LEN);
+}
+
+int args_parse_backlog(int index, char const* arg, int failover) {
+  char const* value = arg + ARG_BACKLOG_PREFIX_LEN;
+  VRB("Backlog is provided by argv[%d] =>  [value::%s]", index, value);
+  int backlog = atoi(value);
+  if (backlog > 1) {
+    return backlog;
+  }
+  WRN("Bad backlog argument argv[%d] =>  [value::%s]", index, value);
+  return failover;
+}
 
 bool args_is_ip(int i, char const* arg) {
   return 0 == strncmp(ARG_IP_PREFIX, arg, ARG_IP_PREFIX_LEN);

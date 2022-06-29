@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# 2022-06-18
+
+shfile=$0
+shdir=$(realpath "$(dirname "${shfile}")")
+cwd=$shdir
+
+echo "shfile =>  $0"
+echo "shdir  =>  ${shdir}"
+echo "cwd    =>  ${cwd}"
+
+i=1; for arg in "$@"; do
+  echo "arg[${i}] =>  ${arg}"
+  i=$((i + 1))
+done
+
+bin=${cwd}/bin/$(uname)
+exe=${bin}/echo_c_tcp_server_mc_fork
+
+if [ "$#" -gt "1" ]; then
+  ${exe} "$@"
+else
+  ${exe} "--port=9999"
+fi

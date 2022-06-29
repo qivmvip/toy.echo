@@ -10,15 +10,60 @@
 #ifndef OOO_LOONG_TOY_ECHO_C_UTILS_LOG_H
 #define OOO_LOONG_TOY_ECHO_C_UTILS_LOG_H
 
-void vrb(char const* module, char const* tag, char const* file, char const* func, int line, char const* fmt, ...);
+void
+vrb(
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* format,
+  ...
+);
 
-void dbg(char const* module, char const* tag, char const* file, char const* func, int line, char const* fmt, ...);
+void
+dbg(
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* fmt,
+  ...
+);
 
-void inf(char const* module, char const* tag, char const* file, char const* func, int line, char const* fmt, ...);
+void
+inf(
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* format,
+  ...
+);
 
-void wrn(char const* module, char const* tag, char const* file, char const* func, int line, char const* fmt, ...);
+void
+wrn(
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* format,
+  ...
+);
 
-void err(char const* module, char const* tag, char const* file, char const* func, int line, char const* fmt, ...);
+void
+err(
+  char const* module,
+  char const* tag,
+  char const* file,
+  char const* func,
+  int line,
+  char const* format,
+  ...
+);
 
 void raw(char const* fmt, ...);
 

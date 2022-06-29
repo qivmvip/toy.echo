@@ -1,1 +1,5 @@
-IPV4 和 IPV6 不能混用
++ IPV4 的服务器：不能处理使用 IPV6 地址的客户端？
+Connect server socket fail =>  [61::Connection refused]
+
++ IPV6 的服务器：可以处理使用 IPV4 地址的客户端？
+Client address IPV6 =>  [::ffff:127.0.0.1]

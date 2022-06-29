@@ -12,16 +12,22 @@
 
 #include <stdbool.h>
 
-bool args_is_ip(int i, char const* arg);
+bool args_is_backlog(int index, char const* arg);
 
-char const* args_parse_ip(int i, char const* arg, char const* failover);
+int args_parse_backlog(int index, char const* arg, int failover);
 
-bool args_is_port(int i, char const* arg);
+char const* args_parse_ip(int index, char const* arg, char const* failover);
 
-int args_parse_port(int i, char const* arg, int failover);
+bool args_is_ip(int index, char const* arg);
 
-bool args_is_data(int i, char const* arg);
+char const* args_parse_ip(int index, char const* arg, char const* failover);
 
-char const* args_parse_data(int i, char const* arg, char const* failover);
+bool args_is_port(int index, char const* arg);
+
+int args_parse_port(int index, char const* arg, int failover);
+
+bool args_is_data(int index, char const* arg);
+
+char const* args_parse_data(int index, char const* arg, char const* failover);
 
 #endif // OOO_LOONG_TOY_ECHO_C_UTILS_ARGS_H
