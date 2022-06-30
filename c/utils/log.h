@@ -65,6 +65,9 @@ err(
   ...
 );
 
-void raw(char const* fmt, ...);
+void raw(
+  char const* fmt,
+  ...
+);
 
 #endif // OOO_LOONG_TOY_ECHO_C_UTILS_LOG_H

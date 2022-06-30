@@ -6,6 +6,7 @@
 // + date   : 2022-06-27
 // + desc   : log utilities implemetation.
 
+
 #include <stdlib.h>
 #include <string.h>
 #include "./log.h"
@@ -14,9 +15,15 @@
 #define MODULE "gypsy.toy.echo.c.utils"
 #define TAG "args"
 
-#define VRB(fmt, ...) (vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
-#define WRN(fmt, ...) (wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
-#define ERR(fmt, ...) (err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__))
+#define VRB_X(module, tag, fmt, ...) ( \
+  vrb(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
+#define WRN_X(module, tag, fmt, ...) ( \
+  wrn(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
+#define ERR_X(module, tag, fmt, ...) ( \
+  err(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
+)
 #define RAW(fmt, ...) (raw(fmt, __VA_ARGS__))
 
 #define ARG_BACKLOG_PREFIX ("--backlog=")
@@ -31,52 +38,121 @@
 #define ARG_DATA_PREFIX ("--data=")
 #define ARG_DATA_PREFIX_LEN (strlen(ARG_DATA_PREFIX))
 
-bool args_is_backlog(int index, char const* arg) {
+bool args_is_backlog(
+  char const* module,
+  char const* tag,
+  int index,
+  char const* arg
+) {
   return 0 == strncmp(ARG_BACKLOG_PREFIX, arg, ARG_BACKLOG_PREFIX_LEN);
 }
 
-int args_parse_backlog(int index, char const* arg, int failover) {
+int
+args_parse_backlog(
+  char const* module,
+  char const* tag,
+  int index,
+  char const* arg,
+  int failover
+) {
   char const* value = arg + ARG_BACKLOG_PREFIX_LEN;
-  VRB("Backlog is provided by argv[%d] =>  [value::%s]", index, value);
+  VRB_X(
+    module,
+    tag,
+    "Backlog is provided by argv[%d] =>  [value::%s]",
+    index,
+    value
+  );
   int backlog = atoi(value);
   if (backlog > 1) {
     return backlog;
   }
-  WRN("Bad backlog argument argv[%d] =>  [value::%s]", index, value);
+  WRN_X(
+    module,
+    tag,
+    "Bad backlog argument argv[%d] =>  [value::%s]",
+    index,
+    value
+  );
   return failover;
 }
 
-bool args_is_ip(int i, char const* arg) {
+bool
+args_is_ip(
+  char const* module,
+  char const* tag,
+  int i,
+  char const* arg
+) {
   return 0 == strncmp(ARG_IP_PREFIX, arg, ARG_IP_PREFIX_LEN);
 }
 
-char const* args_parse_ip(int i, char const* arg, char const* failover) {
+char const*
+args_parse_ip(
+  char const* module,
+  char const* tag,
+  int index,
+  char const* arg,
+  char const* failover
+) {
   char const* value = arg + ARG_IP_PREFIX_LEN;
-  VRB("IP is provided by argv[%d] =>  [value::%s]", i, value);
+  VRB_X(
+    module,
+    tag,
+    "IP is provided by argv[%d] =>  [value::%s]",
+    index,
+    value
+  );
   return value;
 }
 
-bool args_is_port(int i, char const* arg) {
+bool
+args_is_port(
+  char const* module,
+  char const* tag,
+  int i,
+  char const* arg
+) {
   return 0 == strncmp(ARG_PORT_PREFIX, arg, ARG_PORT_PREFIX_LEN);
 }
 
-int args_parse_port(int i, char const* arg, int failover) {
+int
+args_parse_port(
+  char const* module,
+  char const* tag,
+  int i,
+  char const* arg,
+  int failover
+) {
   char const* value = arg + ARG_PORT_PREFIX_LEN;
-  VRB("Port is provided by argv[%d] =>  [value::%s]", i, value);
+  VRB_X(module, tag, "Port is provided by argv[%d] =>  [value::%s]", i, value);
   int port = atoi(value);
   if (port > 0) {
     return port;
   }
-  WRN("Bad port argument argv[%d] =>  [value::%s]", i, value);
+  WRN_X(module, tag, "Bad port argument argv[%d] =>  [value::%s]", i, value);
   return failover;
 }
 
-bool args_is_data(int i, char const* arg) {
+bool
+args_is_data(
+  char const* module,
+  char const* tag,
+  int i,
+  char const* arg
+) {
   return 0 == strncmp(ARG_DATA_PREFIX, arg, ARG_DATA_PREFIX_LEN);
 }
 
-char const* args_parse_data(int i, char const* arg, char const* failover) {
+char const*
+args_parse_data(
+  char const* module,
+  char const* tag,
+  int i,
+  char const* arg,
+  char const* failover
+) {
   char const* value = arg + ARG_DATA_PREFIX_LEN;
-  VRB("Data is provided by argv[%d] =>  [value::%s]", i, value);
+  VRB_X(module, tag, "Data is provided by argv[%d] =>  [value::%s]", i, value);
   return value;
 }

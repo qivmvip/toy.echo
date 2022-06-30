@@ -43,21 +43,19 @@
 #include <time.h>
 #include <string.h>
 #include <memory.h>
+
 #if !defined(__STDC_NO_ATOMICS__)
 # include <stdatomic.h>
 #endif
+
 #if !defined(__STDC_NO_THREADS__)
 # include <threads.h>
-#else
-# include <pthread.h>
 #endif
+
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#if defined(__APPLE__)
-# include <pthread.h>
-#endif
+#include <pthread.h>
 
 #include "./log.h"
 

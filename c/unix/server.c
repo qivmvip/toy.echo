@@ -132,6 +132,9 @@ int main(int argc, char** argv) {
   char buffer[BUFFER_SIZE] = {0};
   x_sockaddr_un_t client_addr = {0};
   socklen_t client_addr_len = sizeof(client_addr);
+#if defined(X_MULTICLIENT_FORK)
+  signal(SIGCHLD, SIG_IGN);
+#endif
   while (true) {
     VRB("%s", "");
     VRB("#%#011x Server waiting...", ++sn);
@@ -148,42 +151,18 @@ int main(int argc, char** argv) {
     if (AF_UNIX == client_addr_ptr->sa_family) {
       VRB("Client address path =>  [%s]", client_addr.sun_path);
     }
-    VRB("%s", "Echoing ...");
-    while (true) {
-      // read
-      ssize_t const read_n = read(client_sockfd, buffer, BUFFER_SIZE);
-      if (-1 == read_n) {
-        int const error = errno;
-        WRN(
-          "Read socket#%d fail =>  [%d::%s]",
-          client_sockfd,
-          error,
-          strerror(error)
-        );
+# if defined(X_MULTICLIENT_FORK)
+  for (int ac_retries = 0; ac_retries < 3; ++ac_retries) {
+      if (sock_accept(MODULE, TAG, client_sockfd, buffer, BUFFER_SIZE)) {
         break;
       }
-      if (0 == read_n) {
-        fputc('\n', stdout);
-        fflush(stdout);
-        break;
-      }
-      for (int i = 0; i < read_n; ++i) {
-        fputc(buffer[i], stdout);
-        fflush(stdout);
-      }
-      // write
-      ssize_t const write_n = write(client_sockfd, buffer, read_n);
-      if (read_n != write_n) {
-        int const error = errno;
-        WRN(
-          "Write client socket#%d fail =>  [%d::%s]",
-          client_sockfd,
-          error,
-          strerror(error)
-        );
-      }
-    }
+      usleep(11111);
+  }
+  close(client_sockfd);
+# else
+    sock_echo(MODULE, TAG, client_sockfd, buffer, BUFFER_SIZE);
     close(client_sockfd);
+#endif
   }
 
   return EXIT_SUCCESS;

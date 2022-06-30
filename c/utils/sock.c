@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #if defined(__APPLE__)
@@ -34,17 +35,6 @@
 #define MODULE "gypsy.toy.echo.c.utils"
 #define TAG "sock"
 
-#define VRB(fmt, ...) ( \
-  vrb(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
-)
-#define WRN(fmt, ...) ( \
-  wrn(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
-)
-#define ERR(fmt, ...) ( \
-  err(MODULE, TAG, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
-)
-#define RAW(fmt, ...) (raw(fmt, __VA_ARGS__))
-
 #define VRB_X(module, tag, fmt, ...) ( \
   vrb(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
 )
@@ -55,6 +45,36 @@
   err(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
 )
 
+#if defined(X_MULTICLIENT_FORK)
+bool sock_accept(
+  char const* module,
+  char const* tag,
+  int client_sockfd,
+  char* buffer,
+  size_t buffer_size
+) {
+  int const fork_result = fork();
+  if (0 == fork_result) {
+    sock_echo(module, tag, client_sockfd, buffer, buffer_size);
+    close(client_sockfd);
+    exit(EXIT_SUCCESS);
+  } else {
+    if (-1 == fork_result) {
+      int error = errno;
+      ERR_X(
+        module,
+        tag,
+        "Fork child fail =>  [%d::%s]",
+        error,
+        strerror(error)
+      );
+      return false;
+    } else {
+      return true;
+    }
+  }
+}
+#endif
 
 void
 sock_echo(
@@ -64,7 +84,7 @@ sock_echo(
   char* buffer,
   size_t buffer_size
 ) {
-  VRB("%s", "Echoing ...");
+  VRB_X(module, tag, "%s", "Echoing ...");
   while (true) {
     // read
     ssize_t const read_n = read(client_sockfd, buffer, buffer_size);

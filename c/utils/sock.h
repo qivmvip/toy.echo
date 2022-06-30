@@ -36,6 +36,17 @@ typedef struct sockaddr_un x_sockaddr_un_t;
   typedef struct in_addr x_in_addr_t;
 #endif
 
+#if defined(X_MULTICLIENT_FORK)
+bool
+sock_accept(
+  char const* module,
+  char const* tag,
+  int client_sockfd,
+  char* buffer,
+  size_t buffer_size
+);
+#endif
+
 void
 sock_echo(
   char const* module,

@@ -9,6 +9,15 @@
  *
  */
 
+
+#if !defined(__APPLE__)
+# if defined(__linux__)
+#   if !defined(_GNU_SOURCE)
+#     define _GNU_SOURCE
+#   endif
+# endif
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -18,13 +27,13 @@
 #include <signal.h>
 
 #if defined(__APPLE__)
-# include <unistd.h>
 # include <sys/socket.h>
+# include <unistd.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
 #elif defined (__linux__)
-# include <unistd.h>
 # include <sys/socket.h>
+# include <unistd.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
 #else
@@ -61,25 +70,6 @@ static void sigint_handler(int sig) {
   exit(EXIT_FAILURE);
 }
 
-#if defined(X_MULTICLIENT_FORK)
-static bool accept_client(int client_sockfd, char* buffer, size_t buffer_size) {
-  int const fork_result = fork();
-  if (0 == fork_result) {
-    sock_echo(MODULE, TAG, client_sockfd, buffer, BUFFER_SIZE);
-    close(client_sockfd);
-    exit(EXIT_SUCCESS);
-  } else {
-    if (-1 == fork_result) {
-      int error = errno;
-      ERR("Fork child fail =>  [%d::%s]", error, strerror(error));
-      return false;
-    } else {
-      return true;
-    }
-  }
-}
-#endif
-
 int main(int argc, char** argv) {
   int port = PORT;
   int backlog = BACKLOG;
@@ -88,12 +78,12 @@ int main(int argc, char** argv) {
   VRB("argc =>  %d", argc);
   for (int i = 0; i < argc; ++i) {
     VRB("argv[%d]: %s", i, argv[i]);
-    if (args_is_port(i, argv[i])) {
-      port = args_parse_port(i, argv[i], PORT);
+    if (args_is_port(MODULE, TAG, i, argv[i])) {
+      port = args_parse_port(MODULE, TAG, i, argv[i], PORT);
       continue;
     }
-    if (args_is_backlog(i, argv[i])) {
-      backlog = args_parse_backlog(i, argv[i], BACKLOG);
+    if (args_is_backlog(MODULE, TAG, i, argv[i])) {
+      backlog = args_parse_backlog(MODULE, TAG, i, argv[i], BACKLOG);
       continue;
     }
   }
@@ -203,9 +193,9 @@ int main(int argc, char** argv) {
       );
       if (NULL == addr_text_result) {
         int const error = errno;
-        WRN("inet_ntop fail =>  [%d::%s]", error, strerror(error));
+        WRN("inet_ntop AF_INET6 fail =>  [%d::%s]", error, strerror(error));
       } else {
-        VRB("Client address IPV6 =>  [%s]", addr_text_result);
+        VRB("Client address AF_INET6 =>  [%s]", addr_text_result);
       }
     }
 #else
@@ -219,15 +209,15 @@ int main(int argc, char** argv) {
       );
       if (NULL == addr_text_result) {
         int const error = errno;
-        WRN("inet_ntop fail =>  [%d::%s]", error, strerror(error));
+        WRN("inet_ntop AF_INET fail =>  [%d::%s]", error, strerror(error));
       } else {
-        VRB("Client address IPV4 =>  [%s]", addr_text_result);
+        VRB("Client address AF_INET =>  [%s]", addr_text_result);
       }
     }
 # endif
 # if defined(X_MULTICLIENT_FORK)
   for (int ac_retries = 0; ac_retries < 3; ++ac_retries) {
-      if (accept_client(client_sockfd, buffer, BUFFER_SIZE)) {
+      if (sock_accept(MODULE, TAG, client_sockfd, buffer, BUFFER_SIZE)) {
         break;
       }
       usleep(11111);

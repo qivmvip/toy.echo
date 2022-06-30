@@ -20,7 +20,11 @@ fi
 mkdir -vp ${bin}
 
 server=${bin}/echo_c_unix_server
-clang -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/log.c -o ${server}
+clang -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server}
+file ${server}
+
+server=${bin}/echo_c_unix_server_mc_fork
+clang -DX_MULTICLIENT_FORK=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server}
 file ${server}
 
 client=${bin}/echo_c_unix_client

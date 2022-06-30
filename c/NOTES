@@ -1,0 +1,9 @@
++ IPV4 的服务器：不能处理使用 IPV6 地址的客户端？
+- 服务器地址写 ::1 无法访问
+  > Connect server socket fail =>  [61::Connection refused]
+- 服务器地址写 ::ffff:7f00:1 可以访问
+
++ IPV6 的服务器：可以处理使用 IPV4 地址的客户端？
+Client address IPV6 =>  [::ffff:127.0.0.1]
+
++ 结论：IPV4（客户端/服务端） 和 IPV6（客户端/服务端）可以 inter-communication，只要地址（ipv4 <-> ipv6）转换对就行。

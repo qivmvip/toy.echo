@@ -9,6 +9,7 @@
  *
  */
 
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -74,16 +75,16 @@ int main(int argc, char** argv) {
   VRB("argc =>  %d", argc);
   for (int i = 0; i < argc; ++i) {
     VRB("argv[%d]: %s", i, argv[i]);
-    if (args_is_ip(i, argv[i])) {
-      ip = args_parse_ip(i, argv[i], IP);
+    if (args_is_ip(MODULE, TAG, i, argv[i])) {
+      ip = args_parse_ip(MODULE, TAG, i, argv[i], IP);
       continue;
     }
-    if (args_is_port(i, argv[i])) {
-      port = args_parse_port(i, argv[i], PORT);
+    if (args_is_port(MODULE, TAG, i, argv[i])) {
+      port = args_parse_port(MODULE, TAG, i, argv[i], PORT);
       continue;
     }
-    if (args_is_data(i, argv[i])) {
-      data = args_parse_data(i, argv[i], DATA);
+    if (args_is_data(MODULE, TAG, i, argv[i])) {
+      data = args_parse_data(MODULE, TAG, i, argv[i], DATA);
       continue;
     }
   }

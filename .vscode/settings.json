@@ -21,6 +21,11 @@
     "__locale": "c",
     "thread": "c",
     "_pthread_types.h": "c",
-    "cerrno": "c"
+    "cerrno": "c",
+    "types.h": "c",
+    "time.h": "c",
+    "stdarg.h": "c",
+    "signal.h": "c",
+    "stdlib.h": "c"
   }
 }
