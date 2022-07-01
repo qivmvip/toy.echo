@@ -32,16 +32,13 @@
 #include "./sock.h"
 #include "./log.h"
 
-#define MODULE "gypsy.toy.echo.c.utils"
-#define TAG "sock"
-
-#define VRB_X(module, tag, fmt, ...) ( \
+#define VRB(module, tag, fmt, ...) ( \
   vrb(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
 )
-#define WRN_X(module, tag, fmt, ...) ( \
+#define WRN(module, tag, fmt, ...) ( \
   wrn(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
 )
-#define ERR_X(module, tag, fmt, ...) ( \
+#define ERR(module, tag, fmt, ...) ( \
   err(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
 )
 
@@ -61,7 +58,7 @@ bool sock_accept(
   } else {
     if (-1 == fork_result) {
       int error = errno;
-      ERR_X(
+      ERR(
         module,
         tag,
         "Fork child fail =>  [%d::%s]",
@@ -84,13 +81,13 @@ sock_echo(
   char* buffer,
   size_t buffer_size
 ) {
-  VRB_X(module, tag, "%s", "Echoing ...");
+  VRB(module, tag, "%s", "Echoing ...");
   while (true) {
     // read
     ssize_t const read_n = read(client_sockfd, buffer, buffer_size);
     if (-1 == read_n) {
       int const error = errno;
-      WRN_X(
+      WRN(
         module,
         tag,
         "Read socket#%d fail =>  [%d::%s]",
@@ -113,7 +110,7 @@ sock_echo(
     ssize_t const write_n = write(client_sockfd, buffer, read_n);
     if (read_n != write_n) {
       int const error = errno;
-      WRN_X(
+      WRN(
         module,
         tag,
         "Write client socket#%d fail =>  [%d::%s]",

@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
     .sun_family = AF_UNIX,
   };
 #else
-  x_addr_un_t server_addr = {
+  x_sockaddr_un_t server_addr = {
     .sun_family = AF_UNIX,
   };
 #endif

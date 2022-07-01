@@ -9,6 +9,15 @@
  *
  */
 
+
+#if !defined(__APPLE__)
+# if defined(__linux__)
+#   if !defined(_GNU_SOURCE)
+#     define _GNU_SOURCE
+#   endif
+# endif
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -72,7 +81,7 @@ int main(int argc, char** argv) {
     .sun_family = AF_UNIX,
   };
 #else
-  x_addr_un_t server_addr = {
+  x_sockaddr_un_t server_addr = {
     .sun_family = AF_UNIX,
   };
 #endif

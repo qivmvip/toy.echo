@@ -12,16 +12,13 @@
 #include "./log.h"
 #include "./args.h"
 
-#define MODULE "gypsy.toy.echo.c.utils"
-#define TAG "args"
-
-#define VRB_X(module, tag, fmt, ...) ( \
+#define VRB(module, tag, fmt, ...) ( \
   vrb(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
 )
-#define WRN_X(module, tag, fmt, ...) ( \
+#define WRN(module, tag, fmt, ...) ( \
   wrn(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
 )
-#define ERR_X(module, tag, fmt, ...) ( \
+#define ERR(module, tag, fmt, ...) ( \
   err(module, tag, __FILE__, __func__, __LINE__, fmt, __VA_ARGS__) \
 )
 #define RAW(fmt, ...) (raw(fmt, __VA_ARGS__))
@@ -56,7 +53,7 @@ args_parse_backlog(
   int failover
 ) {
   char const* value = arg + ARG_BACKLOG_PREFIX_LEN;
-  VRB_X(
+  VRB(
     module,
     tag,
     "Backlog is provided by argv[%d] =>  [value::%s]",
@@ -67,7 +64,7 @@ args_parse_backlog(
   if (backlog > 1) {
     return backlog;
   }
-  WRN_X(
+  WRN(
     module,
     tag,
     "Bad backlog argument argv[%d] =>  [value::%s]",
@@ -96,7 +93,7 @@ args_parse_ip(
   char const* failover
 ) {
   char const* value = arg + ARG_IP_PREFIX_LEN;
-  VRB_X(
+  VRB(
     module,
     tag,
     "IP is provided by argv[%d] =>  [value::%s]",
@@ -125,12 +122,12 @@ args_parse_port(
   int failover
 ) {
   char const* value = arg + ARG_PORT_PREFIX_LEN;
-  VRB_X(module, tag, "Port is provided by argv[%d] =>  [value::%s]", i, value);
+  VRB(module, tag, "Port is provided by argv[%d] =>  [value::%s]", i, value);
   int port = atoi(value);
   if (port > 0) {
     return port;
   }
-  WRN_X(module, tag, "Bad port argument argv[%d] =>  [value::%s]", i, value);
+  WRN(module, tag, "Bad port argument argv[%d] =>  [value::%s]", i, value);
   return failover;
 }
 
@@ -153,6 +150,6 @@ args_parse_data(
   char const* failover
 ) {
   char const* value = arg + ARG_DATA_PREFIX_LEN;
-  VRB_X(module, tag, "Data is provided by argv[%d] =>  [value::%s]", i, value);
+  VRB(module, tag, "Data is provided by argv[%d] =>  [value::%s]", i, value);
   return value;
 }
