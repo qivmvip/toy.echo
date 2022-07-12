@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# 2022-06-18
+
+shfile=$0
+shdir=$(realpath "$(dirname "${shfile}")")
+cwd=$shdir
+
+################################################################################
+shfile=$0
+shdir=$(realpath "$(dirname "${shfile}")")
+cwd=$shdir
+
+echo "shfile =>  $0"
+echo "shdir  =>  ${shdir}"
+echo "cwd    =>  ${cwd}"
+
+# args
+i=1; for arg in "$@"; do
+  echo "arg[${i}] =>  ${arg}"
+  i=$((i + 1))
+done
+################################################################################
+
+client=${cwd}/client
+
+if [ "$#" -gt "1" ]; then
+  ${client} "--x-using-ipv6=yes" "$@"
+else
+  ${client} "--x-using-ipv6=yes" "--ip=::ffff:7f00:1" "--port=9999" "--data=hello.$(date +%s)"
+fi

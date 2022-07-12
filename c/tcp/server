@@ -2,6 +2,7 @@
 
 # 2022-06-18
 
+################################################################################
 shfile=$0
 shdir=$(realpath "$(dirname "${shfile}")")
 cwd=$shdir
@@ -10,13 +11,49 @@ echo "shfile =>  $0"
 echo "shdir  =>  ${shdir}"
 echo "cwd    =>  ${cwd}"
 
+# args
 i=1; for arg in "$@"; do
   echo "arg[${i}] =>  ${arg}"
   i=$((i + 1))
 done
+################################################################################
+
+multiclient=undef
+using_ipv6=undef
+multiclient_prefix=--x-multiclient=
+using_ipv6_prefix=--x-using-ipv6=
+for arg in "$@"; do
+  echo "arg =>  ${arg}"
+  case "${arg}" in
+    "${multiclient_prefix}"*)
+      multiclient=${arg:${#multiclient_prefix}}
+      ;;
+
+    "${using_ipv6_prefix}"*)
+      using_ipv6=${arg:${#using_ipv6_prefix}}
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+echo "multiclient =>  [${multiclient}]"
+echo "using_ipv6  =>  [${using_ipv6}]"
+
+if [[ "undef" = "${multiclient}" ]]; then
+  multiclient_suffix=""
+else
+  multiclient_suffix="_${multiclient}"
+fi
+
+if [[ "yes" = "${using_ipv6}" ]]; then
+  ipv6_suffix="_ipv6"
+else
+  ipv6_suffix=""
+fi
 
 bin=${cwd}/bin/$(uname)
-exe=${bin}/echo_c_tcp_server
+exe=${bin}/echo_c_tcp_server${ipv6_suffix}${multiclient_suffix}
 
 if [ "$#" -gt "1" ]; then
   ${exe} "$@"

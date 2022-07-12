@@ -162,7 +162,7 @@ int main(int argc, char** argv) {
     }
 # if defined(X_MULTICLIENT_FORK)
   for (int ac_retries = 0; ac_retries < 3; ++ac_retries) {
-      if (sock_accept(MODULE, TAG, client_sockfd, buffer, BUFFER_SIZE)) {
+      if (sock_fork(MODULE, TAG, client_sockfd, buffer, BUFFER_SIZE)) {
         break;
       }
       usleep(11111);

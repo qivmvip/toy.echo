@@ -26,6 +26,9 @@
     "time.h": "c",
     "stdarg.h": "c",
     "signal.h": "c",
-    "stdlib.h": "c"
-  }
+    "stdlib.h": "c",
+    "random": "c",
+    "span": "cpp"
+  },
+  "C_Cpp.dimInactiveRegions": false
 }

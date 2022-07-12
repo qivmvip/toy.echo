@@ -28,27 +28,47 @@ server=${bin}/echo_c_tcp_server
 clang -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server}
 file ${server}
 
-# server6
-server6=${bin}/echo_c_tcp_server6
-clang -DX_USING_IPV6=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server6}
-file ${server6}
+# server_ipv6
+server_ipv6=${bin}/echo_c_tcp_server_ipv6
+clang -DX_USING_IPV6=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server_ipv6}
+file ${server_ipv6}
 
-# server_mc_fork
-server_mc_fork=${bin}/echo_c_tcp_server_mc_fork
-clang -DX_MULTICLIENT_FORK=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server_mc_fork}
-file ${server_mc_fork}
+# server_fork
+server_fork=${bin}/echo_c_tcp_server_fork
+clang -DX_MULTICLIENT_FORK=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server_fork}
+file ${server_fork}
 
-# server6_mc_fork
-server6_mc_fork=${bin}/echo_c_tcp_server6_mc_fork
-clang -DX_USING_IPV6=1 -DX_MULTICLIENT_FORK=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server6_mc_fork}
-file ${server6_mc_fork}
+# server_ipv6_fork
+server_ipv6_fork=${bin}/echo_c_tcp_server_ipv6_fork
+clang -DX_USING_IPV6=1 -DX_MULTICLIENT_FORK=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server_ipv6_fork}
+file ${server_ipv6_fork}
+
+# server_select
+server_select=${bin}/echo_c_tcp_server_select
+clang -DX_MULTICLIENT_SELECT=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server_select}
+file ${server_select}
+
+# server_ipv6_select
+server_ipv6_select=${bin}/echo_c_tcp_server_ipv6_select
+clang -DX_USING_IPV6=1 -DX_MULTICLIENT_SELECT=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server_ipv6_select}
+file ${server_ipv6_select}
+
+# # server_poll
+# server_poll=${bin}/echo_c_tcp_server_poll
+# clang -DX_MULTICLIENT_POLL=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server_poll}
+# file ${server_poll}
+
+# # server_ipv6_poll
+# server_ipv6_poll=${bin}/echo_c_tcp_server_ipv6_poll
+# clang -DX_USING_IPV6=1 -DX_MULTICLIENT_POLL=1 -std=c11 -Wall ${cwd}/server.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${server_ipv6_poll}
+# file ${server_ipv6_poll}
 
 # client
 client=${bin}/echo_c_tcp_client
 clang -std=c11 -Wall ${cwd}/client.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${client}
 file ${client}
 
-# client6
-client6=${bin}/echo_c_tcp_client6
-clang -DX_USING_IPV6=1 -std=c11 -Wall ${cwd}/client.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${client6}
-file ${client6}
+# client_ipv6
+client_ipv6=${bin}/echo_c_tcp_client_ipv6
+clang -DX_USING_IPV6=1 -std=c11 -Wall ${cwd}/client.c ${cwd}/../utils/args.c ${cwd}/../utils/log.c ${cwd}/../utils/sock.c -o ${client_ipv6}
+file ${client_ipv6}

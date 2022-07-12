@@ -1,0 +1,13 @@
+{
+  "files.associations": {
+    "cerrno": "c",
+    "cstdlib": "c",
+    "__locale": "c",
+    "sock.h": "c",
+    "__config": "c",
+    "*.inc": "c",
+    "fstream": "c",
+    "locale": "c",
+    "*.tcc": "c"
+  }
+}

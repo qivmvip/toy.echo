@@ -2,6 +2,7 @@
 
 # 2022-06-18
 
+################################################################################
 shfile=$0
 shdir=$(realpath "$(dirname "${shfile}")")
 cwd=$shdir
@@ -10,16 +11,12 @@ echo "shfile =>  $0"
 echo "shdir  =>  ${shdir}"
 echo "cwd    =>  ${cwd}"
 
+# args
 i=1; for arg in "$@"; do
   echo "arg[${i}] =>  ${arg}"
   i=$((i + 1))
 done
+################################################################################
 
-bin=${cwd}/bin/$(uname)
-exe=${bin}/echo_c_tcp_client6
-
-if [ "$#" -gt "1" ]; then
-  ${exe} "$@"
-else
-  ${exe} "--ip=::1" "--port=9999" "--data=hello.$(date +%s)"
-fi
+server=${cwd}/server
+"${server}" "--x-using-ipv6=yes" "--port=9999"

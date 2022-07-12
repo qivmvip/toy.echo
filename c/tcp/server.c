@@ -138,86 +138,95 @@ int main(int argc, char** argv) {
   }
 
   // bind
-  int bind_result = bind(
-    server_sockfd,
-    (x_sockaddr_t *) &server_addr,
-    sizeof(server_addr)
-  );
-  if (0 != bind_result) {
-    int const error = errno;
-    ERR("Bind server socket fail =>  [%d::%s]", error, strerror(error));
+  x_sockaddr_t const* server_addr_ptr = (x_sockaddr_t const*) &server_addr;
+  socklen_t server_addr_len = (socklen_t) sizeof(server_addr);
+  if (!sock_bind(
+    MODULE, TAG, server_sockfd, server_addr_ptr, server_addr_len
+  )) {
     return EXIT_FAILURE;
   }
 
   // listen
-  int listen_result = listen(server_sockfd, backlog);
-  if (0 != listen_result) {
-    int const error = errno;
-    ERR("Listen server socket fail =>  [%d::%s]", error, strerror(error));
+  if (!sock_listen(MODULE, TAG, server_sockfd, backlog)) {
     return EXIT_FAILURE;
   }
 
-  // accept
   int sn = 0;
   char buffer[BUFFER_SIZE] = {0};
+
 #if defined(X_USING_IPV6)
-  x_sockaddr_in6_t client_addr = {0};
+  struct sockaddr_storage client_addr = {0};
 #else
-  x_sockaddr_in_t client_addr = {0};
+  struct sockaddr_storage client_addr = {0};
 #endif
-  socklen_t client_addr_len = sizeof(client_addr);
-#if defined(X_MULTICLIENT_FORK)
-  signal(SIGCHLD, SIG_IGN);
-#endif
+  x_sockaddr_t* client_addr_ptr = (x_sockaddr_t*) &client_addr;
+  socklen_t client_addr_len = (socklen_t) sizeof(client_addr);
+
+#if defined (X_MULTICLIENT_SELECT)
+  fd_set active_fds;
+  FD_ZERO(&active_fds);
+  FD_SET(server_sockfd, &active_fds);
+  int max_fd = server_sockfd + 1;
+
   while (true) {
     VRB("%s", "");
     VRB("#%#011x Server waiting...", ++sn);
-    memset(&client_addr, 0, client_addr_len);
-    x_sockaddr_t* client_addr_ptr = (x_sockaddr_t*) &client_addr;
-    int const client_sockfd = accept(
-      server_sockfd, client_addr_ptr, &client_addr_len
+    int const select_result = select(FD_SETSIZE, &active_fds, NULL, NULL, NULL);
+    if (-1 == select_result) {
+      return EXIT_FAILURE;
+    }
+    if (0 == select_result) {
+      return EXIT_FAILURE;
+    }
+    VRB("Select max_fd =>  [%d]", max_fd);
+    for (int fd = 0; fd < max_fd; ++fd) {
+      if (FD_ISSET(fd, &active_fds)) {
+        VRB("Select FD_ISSET =>  [%d]", fd);
+        if (fd == server_sockfd) {
+          VRB("Select is server [fd::%d]", fd);
+          int const client_sockfd = sock_accept(
+            MODULE, TAG, server_sockfd, client_addr_ptr, &client_addr_len
+          );
+          if (-1 == client_sockfd) {
+            continue;
+          }
+          sock_dump_peer_addr(MODULE, TAG, client_addr_ptr);
+          FD_SET(client_sockfd, &active_fds);
+          if (client_sockfd >= max_fd) {
+            max_fd = client_sockfd + 1;
+          }
+        } else {
+          VRB("Select go is peer [fd::%d]", fd);
+          sock_echo(MODULE, TAG, fd, buffer, BUFFER_SIZE);
+          FD_CLR(fd, &active_fds);
+          close(fd);
+        }
+      }
+    }
+  }
+#endif
+
+#if defined(X_MULTICLIENT_FORK)
+  signal(SIGCHLD, SIG_IGN);
+#endif
+
+  while (true) {
+    VRB("%s", "");
+    VRB("#%#011x Server waiting...", ++sn);
+    int const client_sockfd = sock_accept(
+      MODULE,
+      TAG,
+      server_sockfd,
+      client_addr_ptr,
+      &client_addr_len
     );
     if (-1 == client_sockfd) {
-      int const error = errno;
-      ERR("Accept client fail =>  [%d::%s]", error, strerror(error));
       continue;
     }
-# if defined(X_USING_IPV6)
-    if (AF_INET6 == client_addr_ptr->sa_family) {
-      char addr_text[BUFFER_SIZE] = {0};
-      char const* addr_text_result = inet_ntop(
-        AF_INET6,
-        &client_addr.sin6_addr,
-        addr_text,
-        BUFFER_SIZE
-      );
-      if (NULL == addr_text_result) {
-        int const error = errno;
-        WRN("inet_ntop AF_INET6 fail =>  [%d::%s]", error, strerror(error));
-      } else {
-        VRB("Client address AF_INET6 =>  [%s]", addr_text_result);
-      }
-    }
-#else
-    if (AF_INET == client_addr_ptr->sa_family) {
-      char addr_text[BUFFER_SIZE] = {0};
-      char const* addr_text_result = inet_ntop(
-        AF_INET,
-        &client_addr.sin_addr,
-        addr_text,
-        BUFFER_SIZE
-      );
-      if (NULL == addr_text_result) {
-        int const error = errno;
-        WRN("inet_ntop AF_INET fail =>  [%d::%s]", error, strerror(error));
-      } else {
-        VRB("Client address AF_INET =>  [%s]", addr_text_result);
-      }
-    }
-# endif
+    sock_dump_peer_addr(MODULE, TAG, client_addr_ptr);
 # if defined(X_MULTICLIENT_FORK)
   for (int ac_retries = 0; ac_retries < 3; ++ac_retries) {
-      if (sock_accept(MODULE, TAG, client_sockfd, buffer, BUFFER_SIZE)) {
+      if (sock_fork(MODULE, TAG, client_sockfd, buffer, BUFFER_SIZE)) {
         break;
       }
       usleep(11111);
@@ -228,6 +237,5 @@ int main(int argc, char** argv) {
     close(client_sockfd);
 #endif
   }
-
   return EXIT_SUCCESS;
 }

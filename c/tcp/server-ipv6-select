@@ -18,11 +18,5 @@ i=1; for arg in "$@"; do
 done
 ################################################################################
 
-bin=${cwd}/bin/$(uname)
-exe=${bin}/echo_c_tcp_server6_mc_fork
-
-if [ "$#" -gt "1" ]; then
-  ${exe} "$@"
-else
-  ${exe} "--port=9999"
-fi
+server=${cwd}/server
+"${server}" "--x-using-ipv6=yes" "--x-multiclient=select" "--port=9999"
